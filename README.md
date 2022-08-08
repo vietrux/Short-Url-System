@@ -1,4 +1,5 @@
 # Short URL System
+Short URL system using ReactJs and Firebase 
 
 ## Setup 
 ```
@@ -9,3 +10,5 @@ npm i
 npm start
 ```
 PORT: 3000
+
+

@@ -55,17 +55,25 @@ export default function Manage() {
   }
 
   async function AddUrl() {
-    if (!shorturi){
+    if (!shorturi) {
       const randomid = GenId();
-      await setDoc(doc(db, "urls", randomid as string), {
-        short: randomid,
-        long: longuri,
-      });
+      //check if protocol is exist
+      if (longuri.includes("://")) {
+        await setDoc(doc(db, "urls", randomid as string), {
+          short: randomid,
+          long: longuri,
+        });
+      } else {
+        await setDoc(doc(db, "urls", randomid as string), {
+          short: randomid,
+          long: "http://" + longuri,
+        });
+      }
       setLong('')
-    }else{
-      if(!longuri){
+    } else {
+      if (!longuri) {
         alert('Vui lòng nhập đủ thông tin');
-      }else{
+      } else {
         await setDoc(doc(db, "urls", shorturi as string), {
           short: shorturi,
           long: longuri,
@@ -97,6 +105,7 @@ export default function Manage() {
 
   return (
     <>
+
       {
         user.uid
           ?
@@ -109,79 +118,86 @@ export default function Manage() {
                 Sign out
               </button>
             </div>
-
-            <div className='overflow-x-auto relative shadow-md sm:rounded-lg my-4'>
-              <table className='w-full text-sm text-left text-gray-500 '>
-                <thead className='text-xs text-gray-700 uppercase bg-gray-50 '>
-                  <tr>
-                    <th scope="col" className="py-3 px-6 w-1/5">Short</th>
-                    <th scope="col" className="py-3 px-6 w-3/5">Long</th>
-                    <th scope="col" className="py-3 px-6 w-1/5 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className='bg-white border-b hover:bg-gray-50 '>
-                    <td className='py-4 px-6'>
-                      <input
-                        onChange={
-                          (e) => {
-                            setShort(e.target.value);
-                          }
-                        }
-                        value={shorturi}
-                        className=' appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none '
-                        type='text' placeholder='Short URL' />
-                    </td>
-                    <td className='py-4 px-6'>
-                      <input
-                        onChange={
-                          (e) => {
-                            setLong(e.target.value);
-                          }
-                        }
-                        value={longuri}
-                        className=' appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight ' type='text' placeholder='Long URL' />
-                    </td>
-                    <td className='py-4 px-6 cursor-pointer text-center'>
-                      <button
-                        onClick={
-                          async () => {
-                            await GenId();
-                            AddUrl();
-                          }
-                        }
-                        className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
-                        Shorten
-                      </button>
-                    </td>
-                  </tr>
-                  {
-                    urls ? urls.map((url, index) => {
-                      return (
-                        <tr key={index} className='bg-white border-b hover:bg-gray-50 '>
-                          <td className='py-4 px-6'><a href={`https://vtrg.tk/${url?.short}`}>{url?.short}</a></td>
-                          <td className='py-4 px-6'><a href={url?.long}>{url?.long}</a></td>
-                          <td onClick={() => DeleteUrl(url.short)} className='py-4 px-6 cursor-pointer text-center'>
-                            <button
-                              onClick={() => DeleteUrl(url.short)}
-                              className='bg-blue-100 hover:bg-blue-200 text-white font-bold py-2 px-4 rounded'>
-                              <svg className='h-6 w-6 text-red-500 mx-auto' fill='currentColor' viewBox='0 0 24 24'>
-                                <path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z' />
-                                <path d='M0 0h24v24H0z' fill='none' />
-                              </svg>
-                            </button>
-                          </td>
-                        </tr>
-                      )
-                    })
-                      :
+            {
+              user.uid !== 'UtiDQtZqchVJF7ZhwrUnWdWic7g1' ?
+                <div className="flex my-8 mx-auto justify-center">
+                  Bạn không có cửa đâu
+                </div>
+                :
+                <div className='overflow-x-auto relative shadow-md sm:rounded-lg my-4'>
+                  <table className='w-full text-sm text-left text-gray-500 '>
+                    <thead className='text-xs text-gray-700 uppercase bg-gray-50 '>
                       <tr>
-                        <td colSpan={2}>No urls</td>
+                        <th scope="col" className="py-3 px-6 w-1/5">Short</th>
+                        <th scope="col" className="py-3 px-6 w-3/5">Long</th>
+                        <th scope="col" className="py-3 px-6 w-1/5 text-center">Action</th>
                       </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody>
+                      <tr className='bg-white border-b hover:bg-gray-50 '>
+                        <td className='py-4 px-6'>
+                          <input
+                            onChange={
+                              (e) => {
+                                setShort(e.target.value);
+                              }
+                            }
+                            value={shorturi}
+                            className=' appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none '
+                            type='text' placeholder='Short URL' />
+                        </td>
+                        <td className='py-4 px-6'>
+                          <input
+                            onChange={
+                              (e) => {
+                                setLong(e.target.value);
+                              }
+                            }
+                            value={longuri}
+                            className=' appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight ' type='text' placeholder='Long URL' />
+                        </td>
+                        <td className='py-4 px-6 cursor-pointer text-center'>
+                          <button
+                            onClick={
+                              async () => {
+                                await GenId();
+                                AddUrl();
+                              }
+                            }
+                            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
+                            Shorten
+                          </button>
+                        </td>
+                      </tr>
+                      {
+                        urls.length !== 0 ? urls.map((url, index) => {
+                          return (
+                            <tr key={index} className='bg-white border-b hover:bg-gray-50 '>
+                              <td className='py-4 px-6'><a href={`https://vtrg.tk/${url?.short}`}>{url?.short}</a></td>
+                              <td className='py-4 px-6'><a href={url?.long}>{url?.long}</a></td>
+                              <td onClick={() => DeleteUrl(url.short)} className='py-4 px-6 cursor-pointer text-center'>
+                                <button
+                                  onClick={() => DeleteUrl(url.short)}
+                                  className='bg-blue-100 hover:bg-blue-200 text-white font-bold py-2 px-4 rounded'>
+                                  <svg className='h-6 w-6 text-red-500 mx-auto' fill='currentColor' viewBox='0 0 24 24'>
+                                    <path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z' />
+                                    <path d='M0 0h24v24H0z' fill='none' />
+                                  </svg>
+                                </button>
+                              </td>
+                            </tr>
+                          )
+                        })
+                          :
+                          <tr>
+                            <td colSpan={2}>No urls</td>
+                          </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+            }
+
           </div>
           :
           <div className="absolute w-full h-full flex flex-col items-center justify-center">
